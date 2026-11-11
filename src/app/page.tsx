@@ -134,6 +134,7 @@ export default function PosPage() {
   const [catalogViewMode, setCatalogViewMode] = useState<"GRID" | "CLASSIC_TABLE">(
     "GRID"
   );
+  const [mobileTab, setMobileTab] = useState<"CATALOG" | "CART">("CATALOG");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [authUser, setAuthUser] = useState<AuthUserProfile | null>(null);
 
@@ -565,6 +566,7 @@ export default function PosPage() {
     setHeldOrders((prev) => [newHeld, ...prev]);
     setCart([]);
     setGlobalNote("");
+    setMobileTab("CATALOG");
     showToast(`Nota disimpan sementara ke Pending Orders (${customerName})`);
   };
 
@@ -575,6 +577,7 @@ export default function PosPage() {
     setOrderType(order.orderType);
     setGlobalNote(order.globalNote);
     setHeldOrders((prev) => prev.filter((h) => h.id !== order.id));
+    setMobileTab("CART");
     showToast(`Nota "${order.customerName}" dipanggil kembali ke kasir`);
   };
 
@@ -627,6 +630,7 @@ export default function PosPage() {
     setCart([]);
     setGlobalNote("");
     setOrderPhotoAttached(null);
+    setMobileTab("CATALOG");
     return newTx;
   };
 
@@ -698,26 +702,26 @@ export default function PosPage() {
   return (
     <div
       className={`font-sans flex flex-col bg-slate-100 ${
-        appMode === "CASHIER" ? "h-screen overflow-hidden" : "min-h-screen"
+        appMode === "CASHIER" ? "h-[100dvh] overflow-hidden" : "min-h-[100dvh]"
       }`}
     >
       {/* =====================================================================
           1A. TOP NAVIGATION BAR (CLEAN, SLIM 56PX-64PX, MODERN INDONESIAN POS)
       ====================================================================== */}
-      <header className="no-print shrink-0 z-30 h-14 sm:h-16 bg-white text-slate-800 border-b border-slate-200 px-3 sm:px-5 flex items-center justify-between shadow-2xs">
+      <header className="no-print shrink-0 z-30 h-14 sm:h-16 bg-white text-slate-800 border-b border-slate-200 px-2.5 sm:px-5 flex items-center justify-between shadow-2xs">
         {/* Left Side: Sidebar Toggle + Brand Identity + Online Indicator */}
-        <div className="flex items-center gap-2.5 sm:gap-3.5">
+        <div className="flex items-center gap-2 sm:gap-3.5 min-w-0">
           <button
             type="button"
             onClick={() => setSidebarOpen((v) => !v)}
             aria-label="Toggle Menu Sidebar"
-            className="p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition"
+            className="p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition min-w-[38px] min-h-[38px] flex items-center justify-center shrink-0"
           >
             <Menu className="w-5 h-5" />
           </button>
 
           {/* Official CV Banong Farms Logo & Brand Label */}
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
             <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 ring-1.5 ring-emerald-600/30 bg-emerald-700">
               <img
                 src="/logo-banong-farm.png"
@@ -725,24 +729,24 @@ export default function PosPage() {
                 className="w-full h-full object-cover"
               />
             </div>
-            <div className="flex flex-col leading-tight">
-              <div className="flex items-center gap-1.5">
-                <span className="font-extrabold text-slate-900 text-sm sm:text-base tracking-tight">
+            <div className="flex flex-col leading-tight min-w-0">
+              <div className="flex items-center gap-1.5 min-w-0">
+                <span className="font-extrabold text-slate-900 text-xs sm:text-base tracking-tight truncate max-w-[100px] xs:max-w-[140px] sm:max-w-none">
                   CV Banong Farms
                 </span>
                 <span className="hidden md:inline-block text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200">
                   Grosir &amp; Eceran
                 </span>
               </div>
-              <span className="text-[11px] text-slate-500 hidden sm:inline">
-                Pakan Ternak, Unggas, Ikan &amp; Pet Shop
+              <span className="text-[10px] sm:text-[11px] text-slate-500 hidden sm:inline truncate">
+                Pakan Ternak, Unggas &amp; Pet Shop
               </span>
             </div>
           </div>
         </div>
 
-        {/* Center: Clean Segmented Mode Switcher */}
-        <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
+        {/* Center: Desktop Segmented Mode Switcher (Visible on lg and above) */}
+        <div className="hidden lg:flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
           {/* Untuk Kasir: HANYA Kasir & Katalog Produk */}
           {authUser?.role !== "OWNER" && (
             <>
@@ -847,17 +851,70 @@ export default function PosPage() {
           </button>
         </div>
 
+        {/* Center: Mobile Mode / Tab Switcher (Visible on < lg screens) */}
+        <div className="flex lg:hidden items-center gap-1 shrink-0">
+          {authUser?.role !== "OWNER" && appMode === "CASHIER" && (
+            <div className="flex items-center bg-slate-100 p-0.5 rounded-xl border border-slate-200">
+              <button
+                type="button"
+                onClick={() => setMobileTab("CATALOG")}
+                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 ${
+                  mobileTab === "CATALOG"
+                    ? "bg-white text-slate-900 shadow-2xs font-extrabold"
+                    : "text-slate-600 hover:text-slate-900"
+                }`}
+              >
+                <Package className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Katalog</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setMobileTab("CART")}
+                className={`px-2.5 py-1 rounded-lg text-xs font-bold flex items-center gap-1 transition ${
+                  mobileTab === "CART"
+                    ? "bg-emerald-600 text-white shadow-2xs font-extrabold"
+                    : "text-slate-600 hover:text-slate-900"
+                }`}
+              >
+                <ShoppingCart className="w-3.5 h-3.5" />
+                <span>Nota</span>
+                {cart.length > 0 && (
+                  <span
+                    className={`text-[10px] px-1.5 py-0.2 rounded-full font-black ${
+                      mobileTab === "CART"
+                        ? "bg-white text-emerald-800"
+                        : "bg-emerald-600 text-white"
+                    }`}
+                  >
+                    {cart.reduce((s, c) => s + c.qty, 0)}
+                  </span>
+                )}
+              </button>
+            </div>
+          )}
+
+          {appMode !== "CASHIER" && (
+            <span className="text-[11px] font-extrabold text-slate-800 bg-slate-100 px-2 py-1 rounded-lg border border-slate-200">
+              {appMode === "OWNER"
+                ? "Admin"
+                : appMode === "CATALOG_MGMT"
+                ? "Katalog"
+                : "Riwayat"}
+            </span>
+          )}
+        </div>
+
         {/* Right Side: Notification Icon, Single Active Cashier Name, Logout */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
           {/* Notification / Pending Orders Icon with Badge (Hanya untuk Kasir) */}
           {authUser?.role !== "OWNER" && (
             <button
               type="button"
               onClick={() => setIsPendingModalOpen(true)}
               title="Daftar Nota Pakan Tersimpan (Hold / Pending Orders)"
-              className="relative p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition border border-transparent hover:border-slate-200"
+              className="relative p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition border border-transparent hover:border-slate-200 min-w-[36px] min-h-[36px] flex items-center justify-center"
             >
-              <Bell className="w-5 h-5 text-slate-700" />
+              <Bell className="w-4 h-4 sm:w-5 sm:h-5 text-slate-700" />
               {heldOrders.length > 0 && (
                 <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-rose-600 text-white text-[10px] font-black flex items-center justify-center shadow-xs">
                   {heldOrders.length}
@@ -869,7 +926,7 @@ export default function PosPage() {
           <div className="h-5 w-px bg-slate-200 hidden sm:block" />
 
           {/* Active Cashier Display (Single, clean, no duplicate text) */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <div className="hidden sm:flex flex-col text-right leading-tight">
               <span className="text-xs sm:text-sm font-extrabold text-slate-900 truncate max-w-[140px]">
                 {authUser ? authUser.fullName : cashierName}
@@ -883,7 +940,7 @@ export default function PosPage() {
               type="button"
               onClick={handleSignOut}
               title="Keluar dari Sesi Akun (Logout)"
-              className="p-2 sm:px-3 sm:py-1.5 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-700 hover:text-rose-700 border border-slate-200 transition flex items-center gap-1.5 text-xs font-bold"
+              className="p-2 sm:px-3 sm:py-1.5 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-700 hover:text-rose-700 border border-slate-200 transition flex items-center gap-1.5 text-xs font-bold min-w-[36px] min-h-[36px] justify-center"
             >
               <LogOut className="w-4 h-4 text-slate-500 group-hover:text-rose-600" />
               <span className="hidden md:inline">Keluar</span>
@@ -1122,13 +1179,15 @@ export default function PosPage() {
         /* ===================================================================
            1B. AREA KASIR UTAMA (MODERN SPLIT-SCREEN POS: 62% KATALOG | 38% NOTA)
         =================================================================== */
-        <main className="no-print flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-12 overflow-hidden bg-[#F4F6F8]">
+        <main className="no-print flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-12 overflow-hidden bg-[#F4F6F8] relative">
           {/* -----------------------------------------------------------------
               PANEL KIRI: AREA KATALOG PRODUK PAKAN & PERTANIAN (62% - lg:col-span-7 xl:col-span-8)
           ------------------------------------------------------------------ */}
-          <section className="lg:col-span-7 xl:col-span-8 bg-[#F4F6F8] flex flex-col h-full min-h-0 overflow-hidden border-r border-slate-200">
+          <section className={`lg:col-span-7 xl:col-span-8 bg-[#F4F6F8] flex flex-col h-full min-h-0 overflow-hidden border-r border-slate-200 ${
+            mobileTab === "CATALOG" ? "flex" : "hidden lg:flex"
+          }`}>
             {/* Top Search Bar + Add Product + Category Pills */}
-            <div className="px-4 lg:px-6 pt-3 pb-2 space-y-2 shrink-0 bg-white border-b border-slate-200 shadow-2xs">
+            <div className="px-3 sm:px-4 lg:px-6 pt-3 pb-2 space-y-2 shrink-0 bg-white border-b border-slate-200 shadow-2xs">
               <div className="flex items-center gap-2">
                 <div className="relative flex-1">
                   <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -1159,10 +1218,11 @@ export default function PosPage() {
                     setEditingProduct(null);
                     setIsProductModalOpen(true);
                   }}
-                  className="min-h-[42px] px-3.5 sm:px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs sm:text-sm font-extrabold flex items-center gap-1.5 shadow-xs shrink-0 transition active:scale-95"
+                  className="min-h-[42px] px-3 sm:px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs sm:text-sm font-extrabold flex items-center gap-1.5 shadow-xs shrink-0 transition active:scale-95"
                 >
                   <Plus className="w-4 h-4 stroke-[2.5]" />
-                  <span>Tambah Produk</span>
+                  <span className="hidden sm:inline">Tambah Produk</span>
+                  <span className="sm:hidden">Tambah</span>
                 </button>
               </div>
 
@@ -1193,7 +1253,7 @@ export default function PosPage() {
             </div>
 
             {/* Middle Area: Scrollable Product Cards Grid (Clean Continuous POS Tiles) */}
-            <div className="flex-1 min-h-0 px-3 sm:px-4 lg:px-5 py-3 overflow-y-auto">
+            <div className="flex-1 min-h-0 px-2.5 sm:px-4 lg:px-5 py-3 overflow-y-auto">
               {filteredProducts.length === 0 ? (
                 <div className="h-64 bg-white rounded-2xl border border-slate-200 flex flex-col items-center justify-center text-center p-6 shadow-2xs">
                   <PackageSearch className="w-12 h-12 text-slate-300 mb-2" />
@@ -1215,7 +1275,7 @@ export default function PosPage() {
                   </button>
                 </div>
               ) : (
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-3.5 pb-8">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2.5 sm:gap-3.5 pb-24 lg:pb-8">
                   {filteredProducts.map((product) => {
                     const isLowStock = product.stock > 0 && product.stock <= 5;
                     const isOut = !product.isAvailable || product.stock <= 0;
@@ -1235,7 +1295,7 @@ export default function PosPage() {
                             handleAddToCart(product);
                           }
                         }}
-                        className={`group relative bg-white rounded-2xl p-3.5 sm:p-4 border transition-all select-none flex flex-col justify-between cursor-pointer active:scale-[0.99] ${
+                        className={`group relative bg-white rounded-2xl p-2.5 sm:p-4 border transition-all select-none flex flex-col justify-between cursor-pointer active:scale-[0.99] ${
                           isOut
                             ? "opacity-55 border-slate-200 bg-slate-50 cursor-not-allowed"
                             : inCartQty > 0
@@ -1244,7 +1304,7 @@ export default function PosPage() {
                         }`}
                       >
                         {/* Top: Photo with Overlaid Category & Stock Badges */}
-                        <div className="relative w-full aspect-[4/3] sm:h-36 md:h-40 rounded-xl overflow-hidden bg-slate-100 mb-2.5 shrink-0">
+                        <div className="relative w-full aspect-[4/3] sm:h-36 md:h-40 rounded-xl overflow-hidden bg-slate-100 mb-2 shrink-0">
                           <img
                             src={resolveProductImage(product)}
                             alt={product.name}
@@ -1257,15 +1317,15 @@ export default function PosPage() {
                           />
 
                           {/* Category Badge (Top-Left Pill) */}
-                          <span className="absolute top-2.5 left-2.5 max-w-[65%] truncate bg-black/70 backdrop-blur-xs text-white text-[9px] sm:text-[10px] font-black uppercase px-2 py-0.5 rounded-md tracking-wider shadow-xs">
+                          <span className="absolute top-2 left-2 max-w-[65%] truncate bg-black/70 backdrop-blur-xs text-white text-[9px] sm:text-[10px] font-black uppercase px-1.5 sm:px-2 py-0.5 rounded-md tracking-wider shadow-xs">
                             {product.category === "Pakan Ayam/Unggas"
-                              ? "Ayam / Unggas"
+                              ? "Ayam"
                               : product.category}
                           </span>
 
                           {/* Stock Badge (Top-Right Pill) */}
                           <span
-                            className={`absolute top-2.5 right-2.5 text-[9px] sm:text-[10px] font-black px-2 py-0.5 rounded-md shadow-xs ${
+                            className={`absolute top-2 right-2 text-[9px] sm:text-[10px] font-black px-1.5 sm:px-2 py-0.5 rounded-md shadow-xs ${
                               isOut
                                 ? "bg-slate-900/90 text-white"
                                 : isLowStock
@@ -1285,21 +1345,21 @@ export default function PosPage() {
                               setIsProductModalOpen(true);
                             }}
                             title="Edit Detail Produk"
-                            className="absolute bottom-2.5 left-2.5 p-1.5 rounded-lg bg-black/50 text-white hover:bg-black/80 backdrop-blur-xs opacity-0 group-hover:opacity-100 transition shadow-xs"
+                            className="absolute bottom-2 left-2 p-1.5 rounded-lg bg-black/50 text-white hover:bg-black/80 backdrop-blur-xs opacity-0 group-hover:opacity-100 transition shadow-xs"
                           >
                             <Edit3 className="w-3.5 h-3.5" />
                           </button>
 
                           {/* In-Cart Quantity Indicator */}
                           {inCartQty > 0 && (
-                            <div className="absolute bottom-2.5 right-2.5 min-w-[22px] h-[22px] px-1.5 rounded-full bg-emerald-600 text-white font-black text-xs flex items-center justify-center shadow-md">
+                            <div className="absolute bottom-2 right-2 min-w-[22px] h-[22px] px-1.5 rounded-full bg-emerald-600 text-white font-black text-xs flex items-center justify-center shadow-md">
                               {inCartQty}
                             </div>
                           )}
                         </div>
 
-                        {/* Bottom Info: Title + Price on Left | Circular Action Plus Button on Right (Never cut off!) */}
-                        <div className="flex items-center justify-between gap-2 pt-1 pb-0.5 px-0.5 min-w-0 shrink-0">
+                        {/* Bottom Info: Title + Price on Left | Circular Action Plus Button on Right */}
+                        <div className="flex items-center justify-between gap-1.5 pt-1 pb-0.5 px-0.5 min-w-0 shrink-0">
                           <div className="flex-1 min-w-0 space-y-0.5 text-left">
                             <h3
                               className="font-extrabold text-xs sm:text-[13px] text-slate-900 leading-tight truncate"
@@ -1308,12 +1368,12 @@ export default function PosPage() {
                               {product.name}
                             </h3>
 
-                            <div className="flex items-baseline gap-1.5">
-                              <span className="text-sm sm:text-base font-black text-slate-900 tabular-nums">
+                            <div className="flex items-baseline gap-1">
+                              <span className="text-xs sm:text-base font-black text-slate-900 tabular-nums">
                                 {formatRupiah(product.sellPrice)}
                               </span>
-                              <span className="text-[10px] font-bold text-slate-400 truncate">
-                                / {product.unit || "1 Kg"}
+                              <span className="text-[9px] sm:text-[10px] font-bold text-slate-400 truncate">
+                                /{product.unit || "Kg"}
                               </span>
                             </div>
                           </div>
@@ -1327,7 +1387,7 @@ export default function PosPage() {
                             }}
                             disabled={isOut}
                             title="Tambahkan ke Keranjang"
-                            className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#E07A5F] hover:bg-[#d0694e] text-white flex items-center justify-center shadow-sm shrink-0 active:scale-90 transition disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                            className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#E07A5F] hover:bg-[#d0694e] text-white flex items-center justify-center shadow-xs shrink-0 active:scale-90 transition disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                           >
                             <Plus className="w-4 h-4 sm:w-5 sm:h-5 stroke-[3]" />
                           </button>
@@ -1338,15 +1398,128 @@ export default function PosPage() {
                 </div>
               )}
             </div>
+
+            {/* Floating Bottom Checkout Bar (HANYA MUNCUL DI HP / MOBILE SAAT ADA BARANG DI NOTA) */}
+            {cart.length > 0 && (
+              <div className="lg:hidden fixed bottom-0 left-0 right-0 z-30 p-3 bg-white/95 backdrop-blur-md border-t border-slate-200/90 shadow-[0_-8px_20px_rgba(0,0,0,0.12)] safe-area-bottom">
+                <div className="flex items-center justify-between gap-3 max-w-lg mx-auto">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="relative w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0">
+                      <ShoppingCart className="w-5 h-5" />
+                      <span className="absolute -top-1.5 -right-1.5 min-w-[20px] h-[20px] px-1 rounded-full bg-emerald-600 text-white text-[11px] font-black flex items-center justify-center shadow-xs">
+                        {cart.reduce((sum, item) => sum + item.qty, 0)}
+                      </span>
+                    </div>
+                    <div className="min-w-0">
+                      <span className="text-[10px] font-black uppercase text-slate-500 tracking-wider block">
+                        Total Tagihan
+                      </span>
+                      <span className="text-sm sm:text-base font-black text-slate-900 tabular-nums truncate block">
+                        {formatRupiah(cartSummary.grandTotal)}
+                      </span>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setMobileTab("CART")}
+                    className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-extrabold text-xs sm:text-sm flex items-center gap-1.5 shadow-md shadow-emerald-700/20 shrink-0 transition cursor-pointer"
+                  >
+                    <span>Buka Nota &amp; Bayar</span>
+                    <span className="text-emerald-200 font-bold">&rarr;</span>
+                  </button>
+                </div>
+              </div>
+            )}
           </section>
         
           {/* -----------------------------------------------------------------
               PANEL KANAN: AREA NOTA / KERANJANG KASIR (38% - lg:col-span-5 xl:col-span-4)
               DESAIN STRUK KASIR PROFESIONAL & SATU-SATUNYA TEMPAT AKSI BAYAR
           ------------------------------------------------------------------ */}
-          <section className="lg:col-span-5 xl:col-span-4 bg-white flex flex-col h-full min-h-0 overflow-hidden shadow-xs border-l border-slate-200">
+          <section className={`lg:col-span-5 xl:col-span-4 bg-white flex flex-col h-full min-h-0 overflow-hidden shadow-xs border-l border-slate-200 ${
+            mobileTab === "CART" ? "flex" : "hidden lg:flex"
+          }`}>
+            {/* Mobile Top Bar to go back to Catalog */}
+            <div className="lg:hidden px-4 py-2.5 bg-slate-900 text-white flex items-center justify-between shrink-0">
+              <button
+                type="button"
+                onClick={() => setMobileTab("CATALOG")}
+                className="inline-flex items-center gap-1.5 text-xs font-extrabold text-slate-200 hover:text-white active:scale-95 transition"
+              >
+                <span>&larr;</span>
+                <span>Kembali ke Katalog Produk</span>
+              </button>
+              <span className="text-[11px] font-bold text-slate-400">
+                {cart.reduce((sum, item) => sum + item.qty, 0)} Barang di Nota
+              </span>
+            </div>
+
             {/* 1. Header Keranjang: Bersih & Minimalis */}
             <div className="px-4 py-3 border-b border-slate-200 bg-slate-50/70 shrink-0 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <ShoppingCart className="w-4 h-4 text-emerald-700" />
+                <h2 className="text-sm font-extrabold text-slate-800">Keranjang Belanja</h2>
+                {cart.length > 0 && (
+                  <span className="text-[11px] font-black bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">
+                    {cart.reduce((sum, item) => sum + item.qty, 0)}
+                  </span>
+                )}
+              </div>
+
+              {cart.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCart([]);
+                    showToast("Keranjang belanja dikosongkan");
+                  }}
+                  title="Kosongkan Keranjang"
+                  className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Kosongkan</span>
+                </button>
+              )}
+            </div>
+
+            {/* 2. Scrollable Cart Items List (Spacious & Clean Layout) */}
+            <div className="flex-1 min-h-0 overflow-y-auto px-4 py-2 divide-y divide-slate-100">
+              {cart.length === 0 ? (
+                <div className="h-full flex flex-col items-center justify-center text-center py-6 text-slate-400 space-y-2">
+                  <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-300">
+                    <Store className="w-6 h-6" />
+                  </div>
+                  <p className="text-sm font-extrabold text-slate-700">
+                    Keranjang Belanja Kosong
+                  </p>
+                  <p className="text-xs text-slate-400 max-w-[220px] leading-relaxed">
+                    Pilih produk dari katalog di sebelah kiri untuk menambah ke nota transaksi.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setMobileTab("CATALOG")}
+                    className="lg:hidden mt-2 px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold"
+                  >
+                    Buka Katalog Produk
+                  </button>
+                </div>
+              ) : (
+                cart.map((item) => (
+                  <CartItemRow
+                    key={item.cartItemId}
+                    item={item}
+                    onUpdateQty={handleUpdateQty}
+                    onTogglePriceTier={handleToggleItemPriceTier}
+                    onRemove={handleRemoveCartItem}
+                    onCustomize={setCustomizingItem}
+                  />
+                ))
+              )}
+            </div>
+
+            {/* 3. Sticky Payment Footer (THE ONLY PLACE FOR PAYMENT & SIMPAN ACTIONS) */}
+            <div className="border-t border-slate-200 bg-slate-50 px-4 py-3 space-y-2 shrink-0 safe-area-bottom">
               <div className="flex items-center gap-2">
                 <ShoppingCart className="w-4 h-4 text-emerald-700" />
                 <h2 className="text-sm font-extrabold text-slate-800">Keranjang Belanja</h2>

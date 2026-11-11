@@ -127,7 +127,7 @@ export const ItemCustomizationModal: React.FC<ItemCustomizationModalProps> = ({
       ref={dialogRef}
       {...({ closedby: "any" } as React.DialogHTMLAttributes<HTMLDialogElement>)}
       aria-labelledby={titleId}
-      className="no-print w-full max-w-xl rounded-3xl bg-white p-0 text-slate-900 shadow-2xl border border-slate-200 backdrop:bg-slate-950/60 backdrop:backdrop-blur-sm"
+      className="no-print w-[95vw] sm:w-full max-w-xl max-h-[92dvh] overflow-y-auto m-auto my-auto rounded-3xl bg-white p-0 text-slate-900 shadow-2xl border border-slate-200 backdrop:bg-slate-950/60 backdrop:backdrop-blur-sm"
     >
       <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/80">
         <div>

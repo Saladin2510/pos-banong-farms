@@ -177,9 +177,9 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
       ref={dialogRef}
       {...({ closedby: "any" } as React.DialogHTMLAttributes<HTMLDialogElement>)}
       aria-labelledby={titleId}
-      className={`no-print w-full ${
+      className={`no-print w-[95vw] sm:w-full ${
         completedTx && paperSize === "dot-matrix" ? "max-w-5xl" : "max-w-3xl"
-      } rounded-3xl bg-white p-0 text-slate-900 shadow-2xl border border-slate-200 backdrop:bg-slate-950/60 backdrop:backdrop-blur-sm transition-all duration-300`}
+      } max-h-[92dvh] overflow-y-auto m-auto my-auto rounded-3xl bg-white p-0 text-slate-900 shadow-2xl border border-slate-200 backdrop:bg-slate-950/60 backdrop:backdrop-blur-sm transition-all duration-300`}
     >
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/80">

@@ -243,7 +243,7 @@ export const ProductCatalogView: React.FC<ProductCatalogViewProps> = ({
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
           {filteredProducts.map((product) => {
             const isLowStock = product.stock > 0 && product.stock <= 5;
             const isOut = !product.isAvailable || product.stock <= 0;
@@ -251,7 +251,7 @@ export const ProductCatalogView: React.FC<ProductCatalogViewProps> = ({
             return (
               <div
                 key={product.id}
-                className="bg-white rounded-3xl border border-slate-200 shadow-2xs hover:shadow-md hover:border-slate-300 transition-all p-4 flex flex-col justify-between group"
+                className="bg-white rounded-3xl border border-slate-200 shadow-2xs hover:shadow-md hover:border-slate-300 transition-all p-3 sm:p-4 flex flex-col justify-between group"
               >
                 <div>
                   {/* Top: Image + Badges */}
