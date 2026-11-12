@@ -2,7 +2,10 @@ import React from "react";
 import { Transaction } from "@/types/pos";
 import { STORE_INFO } from "@/data/initialData";
 import {
+  formatAccountingNumber,
   formatDateTimeID,
+  formatInvoiceDateTime,
+  formatInvoiceDueDate,
   formatRupiah,
   formatTerbilang,
   getCartItemNetTotal,
@@ -25,253 +28,320 @@ export const ReceiptPrint: React.FC<ReceiptPrintProps> = ({
 }) => {
   if (!transaction) return null;
 
-  // Calculate total kilograms and total packages
-  let totalKg = 0;
-  let totalPcs = 0;
-  transaction.items.forEach((it) => {
-    totalPcs += it.qty;
-    const unitLower = (it.product.unit || "").toLowerCase();
-    if (unitLower.includes("sak") || unitLower.includes("50")) {
-      totalKg += it.qty * 50;
-    } else if (unitLower.includes("kg")) {
-      totalKg += it.qty * 1;
-    } else if (unitLower.includes("bungkus") || unitLower.includes("bks")) {
-      totalKg += it.qty * 0.5;
-    } else {
-      totalKg += it.qty * 1;
-    }
-  });
+  // Calculate total quantity of items
+  const totalItemQty = transaction.items.reduce((sum, it) => sum + it.qty, 0);
 
-  const invoiceChars = transaction.invoiceNo.split("");
-  const customerDisplay = transaction.customerName || "Pembeli Umum";
-  const plateDisplay = transaction.globalNote?.toUpperCase().includes("PLAT")
-    ? transaction.globalNote.toUpperCase()
-    : transaction.tableNumber || "R 8522 OC (Armada Toko)";
+  const customerDisplay =
+    transaction.customerName && transaction.customerName !== "Pembeli Umum"
+      ? transaction.customerName
+      : STORE_INFO.defaultCustomer;
+
+  const addressDisplay =
+    transaction.tableNumber && transaction.tableNumber !== "Ambil di Toko"
+      ? transaction.tableNumber
+      : STORE_INFO.defaultAddress;
+
+  const cashierDisplay =
+    transaction.cashierName?.split(" ")[0]?.toUpperCase() || "ADMIN";
 
   // --------------------------------------------------------------------------
-  // 1. FORMAT FAKTUR CONTINUOUS FORM UNTUK PRINTER DOT MATRIX (SPC SQ 300)
-  // Desain sesuai standar faktur timbangan pakan ternak (New Hope / Charoen Pokphand)
+  // 1. FORMAT FAKTUR PENJUALAN CONTINUOUS FORM (SPC SQ 300 / DOT MATRIX)
+  // Desain 100% presisi sesuai standar faktur penjualan CV Fortuna Baru PS / Banong
   // --------------------------------------------------------------------------
   if (paperSize === "dot-matrix") {
     return (
       <div
         id="printable-receipt"
-        className={`bg-white text-black font-mono text-[11px] leading-tight p-4 mx-auto w-full max-w-[215mm] border border-black/80 ${className}`}
+        className={`bg-white text-black text-[11px] sm:text-[12px] leading-tight p-4 sm:p-6 mx-auto w-full max-w-[215mm] border border-dashed border-slate-300 print:border-none print:p-0 ${className}`}
         style={{
-          fontFamily: "'Courier New', Courier, Consolas, monospace",
+          fontFamily:
+            'Arial, "Helvetica Neue", Helvetica, "Segoe UI", sans-serif',
           WebkitPrintColorAdjust: "exact",
           printColorAdjust: "exact",
         }}
       >
-        {/* Header Perusahaan: Dot Matrix Title */}
-        <div className="border-b-2 border-black pb-2 mb-2 flex items-start justify-between">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-base sm:text-lg font-black tracking-wider uppercase">
-                {STORE_INFO.name} ({STORE_INFO.legalName})
-              </span>
+        {/* ===================================================================
+            HEADER: LOGO & PERUSAHAAN (KIRI) | METADATA TRANSAKSI (KANAN)
+        =================================================================== */}
+        <div className="flex flex-col sm:flex-row items-start justify-between gap-3 pb-1">
+          {/* Sisi Kiri: Logo Siluet Ternak + Header Perusahaan */}
+          <div className="flex items-start gap-3">
+            {/* Siluet Peternakan & Unggas (Rooster & Farm Cattle) */}
+            <svg
+              className="w-14 h-14 shrink-0 text-black fill-current"
+              viewBox="0 0 100 100"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-label="Logo CV. Fortuna Baru PS"
+            >
+              {/* Burung Walet Terbang */}
+              <path d="M10 22 C12 17, 16 18, 18 21 C20 18, 24 19, 26 22 C23 24, 21 26, 18 25 C16 27, 13 26, 10 22 Z" />
+              <path d="M17 14 C19 11, 22 12, 23 14 C25 12, 28 13, 29 15 C27 16, 25 18, 23 17 C21 19, 19 18, 17 14 Z" />
+              {/* Siluet Ayam / Jago */}
+              <path d="M26 26 C25 21, 29 17, 34 19 C37 16, 42 17, 44 21 C48 19, 52 23, 50 27 C53 29, 55 34, 52 38 C56 37, 60 40, 58 45 C56 49, 51 51, 47 49 C45 53, 40 56, 36 54 C33 56, 28 54, 27 50 C24 50, 21 47, 22 43 C19 41, 18 36, 21 32 C23 29, 25 27, 26 26 Z" />
+              {/* Siluet Sapi / Ternak Besar */}
+              <path d="M28 50 C33 45, 42 44, 50 47 C58 50, 65 57, 68 65 C71 73, 68 81, 61 86 C55 90, 47 91, 41 87 C35 83, 30 76, 29 68 C27 63, 26 56, 28 50 Z" />
+              <path
+                d="M40 72 C42 70, 46 71, 48 74 C49 77, 47 81, 44 82 C41 83, 38 80, 38 77 C38 74, 39 73, 40 72 Z"
+                fill="#ffffff"
+              />
+            </svg>
+
+            <div className="space-y-0.5 leading-tight">
+              <h1 className="text-base sm:text-lg font-black tracking-normal uppercase text-black">
+                FAKTUR PENJUALAN
+              </h1>
+              <div className="font-extrabold text-xs sm:text-sm text-black uppercase">
+                {STORE_INFO.name}
+              </div>
+              <div className="text-[10px] sm:text-[11px] text-black uppercase">
+                {STORE_INFO.address}
+              </div>
+              <div className="text-[10px] sm:text-[11px] text-black">
+                {STORE_INFO.phone}
+              </div>
             </div>
-            <p className="text-[10px] font-bold text-black uppercase tracking-wider">
-              Grosir &amp; Eceran Pakan Ternak, Unggas, Ikan &amp; Pet Shop
-            </p>
-            <p className="text-[9px] text-black">
-              {STORE_INFO.address} | Telp/WA: {STORE_INFO.phone}
-            </p>
           </div>
 
-          <div className="text-right">
-            <span className="inline-block border border-black px-2 py-0.5 text-xs font-black uppercase tracking-widest bg-white">
-              FAKTUR &amp; SURAT JALAN
-            </span>
-            <p className="text-[10px] font-bold mt-1">
-              Printer: SPC SQ 300 (Continuous)
-            </p>
+          {/* Sisi Kanan: Metadata Faktur (No Transaksi, Tanggal, Pelanggan, Alamat, Dept, User) */}
+          <div className="w-full sm:w-auto shrink-0 text-[10px] sm:text-[11px] text-black">
+            <div className="grid grid-cols-12 gap-x-2">
+              <div className="col-span-8 space-y-0.5">
+                <div className="flex">
+                  <span className="w-22 shrink-0">No Transaksi</span>
+                  <span className="w-3 shrink-0 text-center">:</span>
+                  <span className="font-bold">{transaction.invoiceNo}</span>
+                </div>
+                <div className="flex">
+                  <span className="w-22 shrink-0">Tanggal</span>
+                  <span className="w-3 shrink-0 text-center">:</span>
+                  <span>{formatInvoiceDateTime(transaction.createdAt)}</span>
+                </div>
+                <div className="flex">
+                  <span className="w-22 shrink-0">Pelanggan</span>
+                  <span className="w-3 shrink-0 text-center">:</span>
+                  <span className="font-bold uppercase truncate max-w-[150px] sm:max-w-[200px]">
+                    {customerDisplay}
+                  </span>
+                </div>
+                <div className="flex">
+                  <span className="w-22 shrink-0">Alamat</span>
+                  <span className="w-3 shrink-0 text-center">:</span>
+                  <span className="uppercase truncate max-w-[150px] sm:max-w-[200px]">
+                    {addressDisplay}
+                  </span>
+                </div>
+              </div>
+
+              <div className="col-span-4 space-y-0.5 pl-2">
+                <div className="flex">
+                  <span className="w-10 shrink-0">Dept.</span>
+                  <span className="w-3 shrink-0 text-center">:</span>
+                  <span>{STORE_INFO.dept}</span>
+                </div>
+                <div className="flex">
+                  <span className="w-10 shrink-0">User</span>
+                  <span className="w-3 shrink-0 text-center">:</span>
+                  <span className="uppercase">{cashierDisplay}</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Top Meta Info: Box Grid (Match New Hope Sales Weighing Slip) */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 border border-black text-[10px] mb-2 divide-x divide-y sm:divide-y-0 divide-black">
-          <div className="p-1.5 space-y-0.5">
-            <span className="block font-bold text-gray-700 uppercase text-[9px]">Weigh NO / No. Faktur:</span>
-            <strong className="block text-xs font-black tracking-wider">{transaction.invoiceNo}</strong>
-          </div>
-          <div className="p-1.5 space-y-0.5">
-            <span className="block font-bold text-gray-700 uppercase text-[9px]">Date / Tanggal:</span>
-            <strong className="block text-xs font-black">{formatDateTimeID(transaction.createdAt)}</strong>
-          </div>
-          <div className="p-1.5 space-y-0.5">
-            <span className="block font-bold text-gray-700 uppercase text-[9px]">Plate NO / No. Kendaraan:</span>
-            <strong className="block text-xs font-black">{plateDisplay}</strong>
-          </div>
-          <div className="p-1.5 space-y-0.5">
-            <span className="block font-bold text-gray-700 uppercase text-[9px]">Customer / Pembeli:</span>
-            <strong className="block text-xs font-black truncate">{customerDisplay}</strong>
+        {/* ===================================================================
+            BARIS REKENING BANK & GARIS PEMBATAS TEGAS
+        =================================================================== */}
+        <div className="mt-2 pt-1 border-t border-black">
+          <div className="text-[11px] sm:text-[12px] font-black text-black">
+            <span>Rekening : </span>
+            <span>{STORE_INFO.rekeningText}</span>
           </div>
         </div>
 
-        {/* Tabel Rincian Barang Pakan (Line Items) */}
-        <table className="w-full border-collapse border border-black text-[10px] mb-2">
-          <thead>
-            <tr className="border-b border-black bg-gray-100 font-black uppercase text-center">
-              <th className="border border-black py-1 px-1.5 w-8">No</th>
-              <th className="border border-black py-1 px-2 text-left">Kode / Barang Pakan</th>
-              <th className="border border-black py-1 px-1.5 w-20">Kemasan</th>
-              <th className="border border-black py-1 px-1.5 w-16 text-right">Qty</th>
-              <th className="border border-black py-1 px-1.5 w-20 text-right">Est. Berat</th>
-              <th className="border border-black py-1 px-2 text-right w-24">Harga (Rp)</th>
-              <th className="border border-black py-1 px-1.5 text-right w-16">Diskon</th>
-              <th className="border border-black py-1 px-2 text-right w-28">Subtotal (Rp)</th>
-            </tr>
-          </thead>
-          <tbody>
+        {/* ===================================================================
+            TABEL DAFTAR ITEM BARANG PAKAN (LINE ITEMS)
+            Kolom: No. | Kode Item | Nama Item | Jml Satuan | Harga | Pot | Total
+        =================================================================== */}
+        <div className="mt-1">
+          {/* Garis batas atas & bawah header tabel */}
+          <div className="border-t border-b border-black py-1 flex items-center font-bold text-[10px] sm:text-[11px] text-black">
+            <span className="w-[5%] text-left">No.</span>
+            <span className="w-[12%] text-left">Kode Item</span>
+            <span className="w-[32%] text-left">Nama Item</span>
+            <span className="w-[18%] text-right">Jml Satuan</span>
+            <span className="w-[14%] text-right">Harga</span>
+            <span className="w-[6%] text-right">Pot</span>
+            <span className="w-[13%] text-right">Total</span>
+          </div>
+
+          {/* Baris-baris data barang */}
+          <div className="divide-y-0 text-[10px] sm:text-[11px] text-black py-0.5">
             {transaction.items.map((item, idx) => {
               const netLine = getCartItemNetTotal(item);
               const unitPrice = getCartItemUnitBasePrice(item);
-              const itemKg = (item.product.unit || "").toLowerCase().includes("sak")
-                ? item.qty * 50
-                : item.qty * 1;
+              const unitLabel = item.product.unit
+                ? item.product.unit
+                    .replace(/sak 50 kg/i, "KARUNG")
+                    .replace(/1 kg/i, "KG")
+                    .replace(/sak/i, "KARUNG")
+                    .toUpperCase()
+                : "KARUNG";
 
               return (
-                <tr key={`${item.cartItemId}-${idx}`} className="border-b border-black">
-                  <td className="border border-black py-1 px-1.5 text-center font-bold">
+                <div
+                  key={`${item.cartItemId || item.product.id}-${idx}`}
+                  className="py-0.5 flex items-center text-black"
+                >
+                  <span className="w-[5%] text-left tabular-nums">
                     {idx + 1}
-                  </td>
-                  <td className="border border-black py-1 px-2">
-                    <span className="font-black block">{item.product.name}</span>
-                    <span className="text-[9px] text-gray-700 font-mono">SKU: {item.product.sku}</span>
-                    {item.note && (
-                      <span className="text-[9px] italic block text-gray-800">Ket: {item.note}</span>
-                    )}
-                  </td>
-                  <td className="border border-black py-1 px-1.5 text-center">
-                    {item.product.unit || "1 Kg"}
-                  </td>
-                  <td className="border border-black py-1 px-1.5 text-right font-black">
-                    {item.qty}
-                  </td>
-                  <td className="border border-black py-1 px-1.5 text-right font-mono">
-                    {itemKg} Kg
-                  </td>
-                  <td className="border border-black py-1 px-2 text-right font-mono">
-                    {formatRupiah(unitPrice).replace("Rp ", "")}
-                  </td>
-                  <td className="border border-black py-1 px-1.5 text-right text-gray-700 font-mono">
-                    {item.discountItem > 0 ? formatRupiah(item.discountItem).replace("Rp ", "") : "-"}
-                  </td>
-                  <td className="border border-black py-1 px-2 text-right font-black font-mono">
-                    {formatRupiah(netLine).replace("Rp ", "")}
-                  </td>
-                </tr>
+                  </span>
+                  <span className="w-[12%] text-left font-mono truncate">
+                    {item.product.sku || "00" + (idx + 26)}
+                  </span>
+                  <span className="w-[32%] text-left truncate font-medium">
+                    {item.product.name}
+                  </span>
+                  <span className="w-[18%] text-right tabular-nums">
+                    {formatAccountingNumber(item.qty)} {unitLabel}
+                  </span>
+                  <span className="w-[14%] text-right tabular-nums">
+                    {formatAccountingNumber(unitPrice)}
+                  </span>
+                  <span className="w-[6%] text-right tabular-nums">
+                    {formatAccountingNumber(item.discountItem)}
+                  </span>
+                  <span className="w-[13%] text-right tabular-nums font-semibold">
+                    {formatAccountingNumber(netLine)}
+                  </span>
+                </div>
               );
             })}
-          </tbody>
-        </table>
+          </div>
 
-        {/* Section Ringkasan Timbangan & Finansial (Mirip Format New Hope Sales Weighing) */}
-        <div className="grid grid-cols-1 sm:grid-cols-12 border border-black text-[10px] mb-2 divide-y sm:divide-y-0 sm:divide-x divide-black">
-          {/* Kolom Kiri (7 cols): Data Timbangan Truk / Sak */}
-          <div className="sm:col-span-7 p-2 space-y-1">
-            <span className="font-black text-[9px] uppercase tracking-wider block border-b border-black pb-0.5 mb-1">
-              Catatan Penimbangan &amp; Logistik Pakan:
-            </span>
-            <div className="grid grid-cols-2 gap-x-2 gap-y-0.5 text-[10px]">
-              <div>
-                <span className="text-gray-700">Total Kuantitas: </span>
-                <strong className="font-black">{totalPcs} Kemasan / Sak</strong>
+          {/* Garis batas bawah tabel item barang */}
+          <div className="border-b border-black mt-0.5"></div>
+        </div>
+
+        {/* ===================================================================
+            SECTION RINGKASAN: KETERANGAN & TERBILANG | TOTAL | TANDA TANGAN
+        =================================================================== */}
+        <div className="pt-2 grid grid-cols-12 gap-x-2 text-[10px] sm:text-[11px] text-black">
+          {/* Kolom 1 (Kiri): Keterangan & Terbilang */}
+          <div className="col-span-5 flex flex-col justify-between">
+            <div className="space-y-1">
+              <div className="flex items-start">
+                <span className="w-20 shrink-0">Keterangan</span>
+                <span className="w-3 shrink-0 text-center">:</span>
+                <span className="flex-1">
+                  {transaction.globalNote || ""}
+                </span>
               </div>
-              <div>
-                <span className="text-gray-700">Total Berat Bersih: </span>
-                <strong className="font-black font-mono">{totalKg} Kg</strong>
-              </div>
-              <div>
-                <span className="text-gray-700">Tipe Layanan: </span>
-                <strong>{transaction.orderType}</strong>
-              </div>
-              <div>
-                <span className="text-gray-700">Metode Bayar: </span>
-                <strong className="uppercase">{transaction.paymentMethod} (LUNAS)</strong>
+              <div className="flex items-start">
+                <span className="w-20 shrink-0">Terbilang</span>
+                <span className="w-3 shrink-0 text-center">:</span>
+                <span className="flex-1 italic leading-tight">
+                  {formatTerbilang(transaction.grandTotal).toLowerCase()}
+                </span>
               </div>
             </div>
 
-            <div className="pt-1.5 mt-1 border-t border-dashed border-black text-[9px]">
-              <span className="font-bold">Terbilang: </span>
-              <span className="italic font-bold uppercase">
-                # {formatTerbilang(transaction.grandTotal)} #
+            {/* Tanda Tangan: Bagian Gudang, Pengirim, Penerima (Di Bawah Kolom Kiri) */}
+            <div className="pt-10 grid grid-cols-3 text-center text-[10px] sm:text-[11px] text-black">
+              <div>Bagian Gudang</div>
+              <div>Pengirim</div>
+              <div>Penerima</div>
+            </div>
+          </div>
+
+          {/* Kolom 2 (Tengah): Jml Item, Potongan, Biaya Lain, Tanggal Jt */}
+          <div className="col-span-3 space-y-1 pl-1">
+            <div className="flex items-center">
+              <span className="w-18 shrink-0">Jml Item</span>
+              <span className="w-3 shrink-0 text-center">:</span>
+              <span className="flex-1 text-right tabular-nums">
+                {formatAccountingNumber(totalItemQty)}
+              </span>
+            </div>
+            <div className="flex items-center">
+              <span className="w-18 shrink-0">Potongan</span>
+              <span className="w-3 shrink-0 text-center">:</span>
+              <div className="flex-1 flex justify-between tabular-nums">
+                <span>0,00 %</span>
+                <span>{formatAccountingNumber(transaction.totalDiscount)}</span>
+              </div>
+            </div>
+            <div className="flex items-center">
+              <span className="w-18 shrink-0">Biaya Lain</span>
+              <span className="w-3 shrink-0 text-center">:</span>
+              <span className="flex-1 text-right tabular-nums">
+                {formatAccountingNumber(transaction.taxAmount)}
+              </span>
+            </div>
+            <div className="flex items-center">
+              <span className="w-18 shrink-0">Tanggal Jt</span>
+              <span className="w-3 shrink-0 text-center">:</span>
+              <span className="flex-1 text-right tabular-nums">
+                {formatInvoiceDueDate(transaction.createdAt)}
               </span>
             </div>
           </div>
 
-          {/* Kolom Kanan (5 cols): Rincian Pembayaran Faktur */}
-          <div className="sm:col-span-5 p-2 space-y-1 bg-gray-50/50">
-            <div className="flex justify-between">
-              <span>Subtotal:</span>
-              <span className="font-mono font-bold">{formatRupiah(transaction.subtotal)}</span>
+          {/* Kolom 3 (Kanan): Sub Total, Total Akhir, DP PO, Deposit, Tunai, Kredit, Kembali */}
+          <div className="col-span-4 space-y-1 pl-2">
+            <div className="flex items-center">
+              <span className="w-20 shrink-0">Sub Total</span>
+              <span className="w-3 shrink-0 text-center">:</span>
+              <span className="flex-1 text-right tabular-nums">
+                {formatAccountingNumber(transaction.subtotal)}
+              </span>
             </div>
-            {transaction.totalDiscount > 0 && (
-              <div className="flex justify-between text-black">
-                <span>Potongan Diskon:</span>
-                <span className="font-mono font-bold">-{formatRupiah(transaction.totalDiscount)}</span>
-              </div>
-            )}
-            {transaction.taxAmount > 0 && (
-              <div className="flex justify-between">
-                <span>PPN / Pajak:</span>
-                <span className="font-mono font-bold">{formatRupiah(transaction.taxAmount)}</span>
-              </div>
-            )}
-            <div className="flex justify-between border-t border-black pt-1 font-black text-xs">
-              <span>TOTAL FAKTUR:</span>
-              <span className="font-mono text-sm">{formatRupiah(transaction.grandTotal)}</span>
+            <div className="flex items-center font-bold">
+              <span className="w-20 shrink-0">Total Akhir</span>
+              <span className="w-3 shrink-0 text-center">:</span>
+              <span className="flex-1 text-right tabular-nums font-black">
+                {formatAccountingNumber(transaction.grandTotal)}
+              </span>
             </div>
-            <div className="flex justify-between text-[9px] pt-0.5">
-              <span>Uang Diterima: {formatRupiah(transaction.amountPaid)}</span>
-              <span>Kembalian: {formatRupiah(transaction.changeAmount)}</span>
+            <div className="flex items-center">
+              <span className="w-20 shrink-0">DP PO</span>
+              <span className="w-3 shrink-0 text-center">:</span>
+              <span className="flex-1 text-right tabular-nums">0,00</span>
+            </div>
+            <div className="flex items-center">
+              <span className="w-20 shrink-0">Deposit</span>
+              <span className="w-3 shrink-0 text-center">:</span>
+              <span className="flex-1 text-right tabular-nums">0,00</span>
+            </div>
+            <div className="flex items-center">
+              <span className="w-20 shrink-0">Tunai</span>
+              <span className="w-3 shrink-0 text-center">:</span>
+              <span className="flex-1 text-right tabular-nums">
+                {formatAccountingNumber(
+                  transaction.paymentMethod === "Tunai"
+                    ? transaction.amountPaid
+                    : 0
+                )}
+              </span>
+            </div>
+            <div className="flex items-center">
+              <span className="w-20 shrink-0">Kredit</span>
+              <span className="w-3 shrink-0 text-center">:</span>
+              <span className="flex-1 text-right tabular-nums">
+                {formatAccountingNumber(
+                  transaction.paymentMethod !== "Tunai"
+                    ? transaction.grandTotal
+                    : 0
+                )}
+              </span>
+            </div>
+            <div className="flex items-center">
+              <span className="w-20 shrink-0">Kembali</span>
+              <span className="w-3 shrink-0 text-center">:</span>
+              <span className="flex-1 text-right tabular-nums">
+                {formatAccountingNumber(transaction.changeAmount)}
+              </span>
             </div>
           </div>
-        </div>
-
-        {/* 4 Kolom Tanda Tangan & Stempel Resmi (Sesuai Gambar Timbangan New Hope) */}
-        <div className="grid grid-cols-4 border border-black text-center text-[9px] mt-2 divide-x divide-black">
-          <div className="p-1 flex flex-col justify-between h-20">
-            <span className="font-bold uppercase">Penerima / Supir</span>
-            <div className="text-[8px] text-gray-500 italic">(Tanda Tangan)</div>
-            <span className="border-t border-black pt-0.5 font-bold uppercase truncate px-1">
-              ( {customerDisplay.split(" ")[0]} )
-            </span>
-          </div>
-
-          <div className="p-1 flex flex-col justify-between h-20">
-            <span className="font-bold uppercase">Petugas Timbang</span>
-            <div className="text-[8px] text-gray-500 italic">(Weigher)</div>
-            <span className="border-t border-black pt-0.5 font-bold uppercase truncate px-1">
-              ( {transaction.cashierName.split(" ")[0]} )
-            </span>
-          </div>
-
-          <div className="p-1 flex flex-col justify-between h-20">
-            <span className="font-bold uppercase">Kasir / Sales</span>
-            <div className="text-[8px] text-gray-500 italic">(Penjualan)</div>
-            <span className="border-t border-black pt-0.5 font-bold uppercase truncate px-1">
-              ( {transaction.cashierName} )
-            </span>
-          </div>
-
-          <div className="p-1 flex flex-col justify-between h-20 relative">
-            <span className="font-bold uppercase">Disetujui / Cap</span>
-            {/* Visual Circular Stamp CV Banong Farms */}
-            <div className="w-11 h-11 rounded-full border-2 border-black/80 mx-auto flex items-center justify-center text-[6px] font-black uppercase text-center leading-none rotate-[-12deg] select-none opacity-85">
-              BANONG<br/>FARMS<br/>LUNAS
-            </div>
-            <span className="border-t border-black pt-0.5 font-bold uppercase truncate px-1">
-              ( Bagian Gudang )
-            </span>
-          </div>
-        </div>
-
-        {/* Bottom Note */}
-        <div className="mt-2 pt-1 border-t border-dashed border-black flex justify-between text-[8px] text-gray-700">
-          <span>* Lembar 1: Kantor/Kasir | Lembar 2: Supir/Customer | Lembar 3: Gudang</span>
-          <span>Dicetak otomatis oleh Sistem PoS CV Banong Farms</span>
         </div>
       </div>
     );
@@ -285,6 +355,7 @@ export const ReceiptPrint: React.FC<ReceiptPrintProps> = ({
   const widthClass =
     is58mm ? "w-[58mm] max-w-[58mm]" : "w-[80mm] max-w-[80mm]";
   const paddingClass = is58mm ? "p-2.5 text-[10px]" : "p-4 text-xs";
+  const invoiceChars = transaction.invoiceNo.split("");
 
   return (
     <div

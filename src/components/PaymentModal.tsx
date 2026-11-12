@@ -177,9 +177,8 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
       ref={dialogRef}
       {...({ closedby: "any" } as React.DialogHTMLAttributes<HTMLDialogElement>)}
       aria-labelledby={titleId}
-      className={`no-print w-[95vw] sm:w-full ${
-        completedTx && paperSize === "dot-matrix" ? "max-w-5xl" : "max-w-3xl"
-      } max-h-[92dvh] overflow-y-auto m-auto my-auto rounded-3xl bg-white p-0 text-slate-900 shadow-2xl border border-slate-200 backdrop:bg-slate-950/60 backdrop:backdrop-blur-sm transition-all duration-300`}
+      className={`no-print w-[95vw] sm:w-full ${completedTx && paperSize === "dot-matrix" ? "max-w-5xl" : "max-w-3xl"
+        } max-h-[92dvh] overflow-y-auto m-auto my-auto rounded-3xl bg-white p-0 text-slate-900 shadow-2xl border border-slate-200 backdrop:bg-slate-950/60 backdrop:backdrop-blur-sm transition-all duration-300`}
     >
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/80">
@@ -302,11 +301,10 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
                         setCashInput(String(grandTotal));
                       }
                     }}
-                    className={`flex items-center justify-center gap-2.5 py-3 px-4 rounded-2xl border-2 font-bold text-sm transition-all ${
-                      active
+                    className={`flex items-center justify-center gap-2.5 py-3 px-4 rounded-2xl border-2 font-bold text-sm transition-all ${active
                         ? "border-emerald-600 bg-emerald-50 text-emerald-950 shadow-xs"
                         : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
-                    }`}
+                      }`}
                   >
                     <Icon className={`w-5 h-5 ${active ? "text-emerald-700" : "text-slate-400"}`} />
                     <span>{m.label}</span>
@@ -350,11 +348,10 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
                       key={den.label}
                       type="button"
                       onClick={() => setCashInput(String(den.value))}
-                      className={`px-3.5 py-2 rounded-xl text-xs font-extrabold border transition ${
-                        numericPaid === den.value
+                      className={`px-3.5 py-2 rounded-xl text-xs font-extrabold border transition ${numericPaid === den.value
                           ? "bg-emerald-600 text-white border-emerald-600 shadow-xs"
                           : "bg-white text-slate-700 border-slate-200 hover:bg-emerald-50 hover:border-emerald-200"
-                      }`}
+                        }`}
                     >
                       {den.label}
                     </button>
@@ -395,11 +392,10 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
                     key={bank}
                     type="button"
                     onClick={() => setSelectedBank(bank)}
-                    className={`px-4 py-2 rounded-xl text-xs font-bold border transition ${
-                      selectedBank === bank
+                    className={`px-4 py-2 rounded-xl text-xs font-bold border transition ${selectedBank === bank
                         ? "bg-emerald-700 text-white border-emerald-700 shadow-xs"
                         : "bg-white text-slate-600 border-slate-200 hover:bg-slate-100"
-                    }`}
+                      }`}
                   >
                     Bank {bank}
                   </button>
@@ -436,30 +432,28 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
             <button
               type="submit"
               disabled={!canSubmit}
-              className={`px-7 py-3.5 rounded-2xl font-extrabold text-sm text-white flex items-center gap-2 transition active:scale-[0.99] ${
-                canSubmit
+              className={`px-7 py-3.5 rounded-2xl font-extrabold text-sm text-white flex items-center gap-2 transition active:scale-[0.99] ${canSubmit
                   ? "bg-emerald-600 hover:bg-emerald-700 shadow-lg shadow-emerald-700/25 cursor-pointer"
                   : "bg-slate-300 text-slate-500 cursor-not-allowed"
-              }`}
+                }`}
             >
               <CheckCircle2 className="w-5 h-5" />
               <span>
                 {grandTotal <= 0
                   ? "Pilih Produk Dulu (Tagihan Rp 0)"
                   : numericPaid < grandTotal
-                  ? `Uang Kurang (${formatRupiah(grandTotal - numericPaid)})`
-                  : "Konfirmasi & Selesaikan Pembayaran"}
+                    ? `Uang Kurang (${formatRupiah(grandTotal - numericPaid)})`
+                    : "Konfirmasi & Selesaikan Pembayaran"}
               </span>
             </button>
           </div>
         </form>
       ) : (
         <div
-          className={`p-6 max-h-[85vh] overflow-y-auto ${
-            paperSize === "dot-matrix"
+          className={`p-6 max-h-[85vh] overflow-y-auto ${paperSize === "dot-matrix"
               ? "flex flex-col gap-6"
               : "grid grid-cols-1 md:grid-cols-12 gap-6 items-start"
-          }`}
+            }`}
         >
           <div className={paperSize === "dot-matrix" ? "w-full space-y-4" : "md:col-span-5 space-y-4"}>
             <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 space-y-2">
@@ -496,11 +490,10 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
                 <button
                   type="button"
                   onClick={() => handleSelectPaper("dot-matrix")}
-                  className={`py-2 px-3 rounded-xl text-xs font-bold border transition text-left sm:text-center cursor-pointer ${
-                    paperSize === "dot-matrix"
+                  className={`py-2 px-3 rounded-xl text-xs font-bold border transition text-left sm:text-center cursor-pointer ${paperSize === "dot-matrix"
                       ? "bg-emerald-700 text-white border-emerald-700 shadow-xs"
                       : "bg-white text-slate-700 border-slate-200 hover:bg-slate-100"
-                  }`}
+                    }`}
                 >
                   <span className="block font-black">🖨️ Faktur Dot Matrix</span>
                   <span className="text-[10px] opacity-80">SPC SQ 300 / Continuous</span>
@@ -509,11 +502,10 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
                 <button
                   type="button"
                   onClick={() => handleSelectPaper("80mm")}
-                  className={`py-2 px-3 rounded-xl text-xs font-bold border transition text-left sm:text-center cursor-pointer ${
-                    paperSize === "80mm"
+                  className={`py-2 px-3 rounded-xl text-xs font-bold border transition text-left sm:text-center cursor-pointer ${paperSize === "80mm"
                       ? "bg-emerald-700 text-white border-emerald-700 shadow-xs"
                       : "bg-white text-slate-700 border-slate-200 hover:bg-slate-100"
-                  }`}
+                    }`}
                 >
                   <span className="block font-black">Thermal 80mm</span>
                   <span className="text-[10px] opacity-80">Struk Roll Standar</span>
@@ -522,11 +514,10 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
                 <button
                   type="button"
                   onClick={() => handleSelectPaper("58mm")}
-                  className={`py-2 px-3 rounded-xl text-xs font-bold border transition text-left sm:text-center cursor-pointer ${
-                    paperSize === "58mm"
+                  className={`py-2 px-3 rounded-xl text-xs font-bold border transition text-left sm:text-center cursor-pointer ${paperSize === "58mm"
                       ? "bg-emerald-700 text-white border-emerald-700 shadow-xs"
                       : "bg-white text-slate-700 border-slate-200 hover:bg-slate-100"
-                  }`}
+                    }`}
                 >
                   <span className="block font-black">Thermal 58mm</span>
                   <span className="text-[10px] opacity-80">Struk Mini Bluetooth</span>
@@ -556,9 +547,8 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
           </div>
 
           <div
-            className={`${
-              paperSize === "dot-matrix" ? "w-full" : "md:col-span-7"
-            } bg-slate-100 p-4 rounded-2xl border border-slate-200 flex flex-col items-center overflow-x-auto`}
+            className={`${paperSize === "dot-matrix" ? "w-full" : "md:col-span-7"
+              } bg-slate-100 p-4 rounded-2xl border border-slate-200 flex flex-col items-center overflow-x-auto`}
           >
             <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">
               Preview {paperSize === "dot-matrix" ? "Faktur Continuous Form (SPC SQ 300)" : `Struk Thermal (${paperSize})`}

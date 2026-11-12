@@ -449,9 +449,17 @@ export const INITIAL_TRANSACTIONS: Transaction[] = [
 ];
 
 export const STORE_INFO = {
-  name: "CV Banong Farms",
-  legalName: "CV Banong Farms — Pusat Pakan Ternak & Peliharaan (Grosir & Eceran)",
-  address: "Jl. Raya Banong No. 88, Kawasan Agribisnis & Peternakan, Bandung",
-  phone: "0812-8899-7766 / (022) 4209981",
+  name: "CV. FORTUNA BARU PS",
+  shortName: "CV. FORTUNA BARU PS",
+  brandName: "CV Banong Farms",
+  legalName: "CV. FORTUNA BARU PS",
+  address: "DESA PANGKAH RT08/06, PANGKAH",
+  phone: "085826349147-087749881400",
+  bankBca: "3620275866",
+  bankBri: "6070-01-036893-53-5",
+  rekeningText: "BCA 3620275866 | BRI 6070-01-036893-53-5",
+  defaultCustomer: "SDR. ISNAENI (BANONG PS)",
+  defaultAddress: "AJIBARANG",
+  dept: "UTM",
   instagram: "@banongfarm.official",
 };

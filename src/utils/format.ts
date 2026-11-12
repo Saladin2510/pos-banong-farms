@@ -93,3 +93,40 @@ export function formatTerbilang(num: number): string {
   return `${bilang(nominal)} Rupiah`;
 }
 
+export function formatAccountingNumber(amount: number): string {
+  const absVal = Math.abs(amount || 0);
+  const formatted = new Intl.NumberFormat("id-ID", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(absVal);
+  return amount < 0 ? `-${formatted}` : formatted;
+}
+
+export function formatInvoiceDateTime(isoString: string): string {
+  try {
+    const d = new Date(isoString);
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const year = d.getFullYear();
+    const hours = String(d.getHours()).padStart(2, "0");
+    const minutes = String(d.getMinutes()).padStart(2, "0");
+    const seconds = String(d.getSeconds()).padStart(2, "0");
+    return `${day}/${month}/${year} ${hours}.${minutes}.${seconds}`;
+  } catch {
+    return isoString;
+  }
+}
+
+export function formatInvoiceDueDate(isoString: string, daysAhead = 17): string {
+  try {
+    const d = new Date(isoString);
+    d.setDate(d.getDate() + daysAhead);
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
+  } catch {
+    return isoString;
+  }
+}
+
