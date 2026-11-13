@@ -32,12 +32,16 @@ export const ReceiptPrint: React.FC<ReceiptPrintProps> = ({
   const totalItemQty = transaction.items.reduce((sum, it) => sum + it.qty, 0);
 
   const customerDisplay =
-    transaction.customerName && transaction.customerName !== "Pembeli Umum"
+    transaction.customerName &&
+    transaction.customerName.trim().length > 0 &&
+    transaction.customerName.toLowerCase() !== "pembeli umum"
       ? transaction.customerName
       : STORE_INFO.defaultCustomer;
 
   const addressDisplay =
-    transaction.tableNumber && transaction.tableNumber !== "Ambil di Toko"
+    transaction.tableNumber &&
+    transaction.tableNumber.trim().length > 0 &&
+    transaction.tableNumber.toLowerCase() !== "ambil di toko"
       ? transaction.tableNumber
       : STORE_INFO.defaultAddress;
 
@@ -65,7 +69,7 @@ export const ReceiptPrint: React.FC<ReceiptPrintProps> = ({
         <div>
           {/* Header A4: Logo + Perusahaan + Metadata */}
           <div className="flex items-start justify-between gap-4 pb-2 border-b-2 border-black">
-            <div className="flex items-start gap-4">
+            <div className="flex items-start gap-4 flex-1 min-w-0">
               <div className="w-20 h-20 shrink-0 flex items-center justify-center bg-white">
                 <img
                   src="/logo-banong-bw.png"
@@ -78,14 +82,14 @@ export const ReceiptPrint: React.FC<ReceiptPrintProps> = ({
                 />
               </div>
 
-              <div className="space-y-1">
+              <div className="space-y-1 flex-1 min-w-0">
                 <h1 className="text-xl sm:text-2xl font-black tracking-tight uppercase text-black">
                   FAKTUR PENJUALAN
                 </h1>
                 <div className="font-extrabold text-sm sm:text-base text-black uppercase">
                   {STORE_INFO.name}
                 </div>
-                <div className="text-xs text-black uppercase">
+                <div className="text-xs text-black uppercase leading-normal">
                   {STORE_INFO.address}
                 </div>
                 <div className="text-xs text-black">
@@ -317,8 +321,8 @@ export const ReceiptPrint: React.FC<ReceiptPrintProps> = ({
         =================================================================== */}
         <div className="flex flex-col sm:flex-row items-start justify-between gap-3 pb-1">
           {/* Sisi Kiri: Logo Hitam Putih + Header Perusahaan */}
-          <div className="flex items-start gap-3">
-            {/* Logo Hitam Putih CV Banong Farms / Fortuna Baru */}
+          <div className="flex items-start gap-3 flex-1 min-w-0 pr-2">
+            {/* Logo Hitam Putih CV Banong Farms */}
             <div className="w-14 h-14 shrink-0 flex items-center justify-center bg-white">
               <img
                 src="/logo-banong-bw.png"
@@ -331,18 +335,18 @@ export const ReceiptPrint: React.FC<ReceiptPrintProps> = ({
               />
             </div>
 
-            <div className="space-y-0.5 leading-tight">
+            <div className="space-y-0.5 leading-tight flex-1 min-w-0">
               <h1 className="text-base sm:text-lg font-black tracking-normal uppercase text-black">
                 FAKTUR PENJUALAN
               </h1>
               <div className="font-extrabold text-xs sm:text-sm text-black uppercase">
                 {STORE_INFO.name}
               </div>
-              <div className="text-[10px] sm:text-[11px] text-black uppercase">
+              <div className="text-[9.5px] sm:text-[10.5px] text-black uppercase leading-snug">
                 {STORE_INFO.address}
               </div>
               <div className="text-[10px] sm:text-[11px] text-black">
-                {STORE_INFO.phone}
+                Telp/WA: {STORE_INFO.phone}
               </div>
             </div>
           </div>

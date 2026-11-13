@@ -449,16 +449,16 @@ export const INITIAL_TRANSACTIONS: Transaction[] = [
 ];
 
 export const STORE_INFO = {
-  name: "CV. FORTUNA BARU PS",
-  shortName: "CV. FORTUNA BARU PS",
+  name: "CV. BANONG FARMS AJIBARANG",
+  shortName: "CV. BANONG FARMS",
   brandName: "CV Banong Farms",
-  legalName: "CV. FORTUNA BARU PS",
-  address: "DESA PANGKAH RT08/06, PANGKAH",
-  phone: "085826349147-087749881400",
+  legalName: "CV. BANONG FARMS AJIBARANG",
+  address: "H3VF+9PX, Jl. Tambakan, Tambakan, Ajibarang Kulon, Kec. Ajibarang, Kabupaten Banyumas, Jawa Tengah 53163, Indonesia",
+  phone: "085826349147 - 087749881400",
   bankBca: "3620275866",
   bankBri: "6070-01-036893-53-5",
   rekeningText: "BCA 3620275866 | BRI 6070-01-036893-53-5",
-  defaultCustomer: "SDR. ISNAENI (BANONG PS)",
+  defaultCustomer: "PELANGGAN UMUM",
   defaultAddress: "AJIBARANG",
   dept: "UTM",
   instagram: "@banongfarm.official",
