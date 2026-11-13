@@ -381,7 +381,7 @@ export const TransactionHistoryView: React.FC<TransactionHistoryViewProps> = ({
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div
             className={`bg-slate-100 w-full ${
-              paperSize === "dot-matrix" ? "max-w-4xl" : "max-w-md"
+              paperSize === "dot-matrix" || paperSize === "a4" ? "max-w-4xl" : "max-w-md"
             } rounded-3xl shadow-2xl border border-slate-300 overflow-hidden flex flex-col max-h-[92vh] animate-in fade-in zoom-in-95 duration-200 transition-all`}
           >
             {/* Modal Header */}
@@ -393,8 +393,20 @@ export const TransactionHistoryView: React.FC<TransactionHistoryViewProps> = ({
                 </h3>
               </div>
 
-              {/* Paper Size Selector (Dot Matrix vs 80mm vs 58mm) */}
+              {/* Paper Size Selector (A4 vs Dot Matrix vs 80mm vs 58mm) */}
               <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl text-xs font-bold">
+                <button
+                  type="button"
+                  onClick={() => setPaperSize("a4")}
+                  className={`px-2.5 py-1 rounded-lg transition cursor-pointer ${
+                    paperSize === "a4"
+                      ? "bg-emerald-700 text-white shadow-xs font-black"
+                      : "text-slate-600 hover:text-slate-900"
+                  }`}
+                  title="Faktur Standar Kertas A4 (HVS Penuh)"
+                >
+                  📄 Faktur A4
+                </button>
                 <button
                   type="button"
                   onClick={() => setPaperSize("dot-matrix")}

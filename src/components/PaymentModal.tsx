@@ -177,7 +177,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
       ref={dialogRef}
       {...({ closedby: "any" } as React.DialogHTMLAttributes<HTMLDialogElement>)}
       aria-labelledby={titleId}
-      className={`no-print w-[95vw] sm:w-full ${completedTx && paperSize === "dot-matrix" ? "max-w-5xl" : "max-w-3xl"
+      className={`no-print w-[95vw] sm:w-full ${completedTx && (paperSize === "dot-matrix" || paperSize === "a4") ? "max-w-5xl" : "max-w-3xl"
         } max-h-[92dvh] overflow-y-auto m-auto my-auto rounded-3xl bg-white p-0 text-slate-900 shadow-2xl border border-slate-200 backdrop:bg-slate-950/60 backdrop:backdrop-blur-sm transition-all duration-300`}
     >
       {/* Header */}
@@ -450,12 +450,12 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
         </form>
       ) : (
         <div
-          className={`p-6 max-h-[85vh] overflow-y-auto ${paperSize === "dot-matrix"
+          className={`p-6 max-h-[85vh] overflow-y-auto ${paperSize === "dot-matrix" || paperSize === "a4"
               ? "flex flex-col gap-6"
               : "grid grid-cols-1 md:grid-cols-12 gap-6 items-start"
             }`}
         >
-          <div className={paperSize === "dot-matrix" ? "w-full space-y-4" : "md:col-span-5 space-y-4"}>
+          <div className={paperSize === "dot-matrix" || paperSize === "a4" ? "w-full space-y-4" : "md:col-span-5 space-y-4"}>
             <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 space-y-2">
               <div className="flex items-center gap-2 text-emerald-950 font-extrabold text-base">
                 <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
@@ -486,7 +486,19 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
               <label className="block text-xs font-bold text-slate-700">
                 Pilih Format Faktur / Printer:
               </label>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleSelectPaper("a4")}
+                  className={`py-2 px-3 rounded-xl text-xs font-bold border transition text-left sm:text-center cursor-pointer ${paperSize === "a4"
+                      ? "bg-emerald-700 text-white border-emerald-700 shadow-xs"
+                      : "bg-white text-slate-700 border-slate-200 hover:bg-slate-100"
+                    }`}
+                >
+                  <span className="block font-black">📄 Faktur A4</span>
+                  <span className="text-[10px] opacity-80">HVS Penuh (1 Hal)</span>
+                </button>
+
                 <button
                   type="button"
                   onClick={() => handleSelectPaper("dot-matrix")}
@@ -495,8 +507,8 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
                       : "bg-white text-slate-700 border-slate-200 hover:bg-slate-100"
                     }`}
                 >
-                  <span className="block font-black">🖨️ Faktur Dot Matrix</span>
-                  <span className="text-[10px] opacity-80">SPC SQ 300 / Continuous</span>
+                  <span className="block font-black">🖨️ Dot Matrix</span>
+                  <span className="text-[10px] opacity-80">SPC SQ 300 / Wartel</span>
                 </button>
 
                 <button
@@ -508,7 +520,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
                     }`}
                 >
                   <span className="block font-black">Thermal 80mm</span>
-                  <span className="text-[10px] opacity-80">Struk Roll Standar</span>
+                  <span className="text-[10px] opacity-80">Struk Standar</span>
                 </button>
 
                 <button
@@ -520,7 +532,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
                     }`}
                 >
                   <span className="block font-black">Thermal 58mm</span>
-                  <span className="text-[10px] opacity-80">Struk Mini Bluetooth</span>
+                  <span className="text-[10px] opacity-80">Struk Mini</span>
                 </button>
               </div>
             </div>
@@ -533,7 +545,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
               >
                 <Printer className="w-5 h-5" />
                 <span>
-                  CETAK {paperSize === "dot-matrix" ? "FAKTUR DOT MATRIX" : `STRUK (${paperSize})`}
+                  CETAK {paperSize === "a4" ? "FAKTUR A4 (HVS)" : paperSize === "dot-matrix" ? "FAKTUR DOT MATRIX" : `STRUK (${paperSize})`}
                 </span>
               </button>
               <button
@@ -547,11 +559,11 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
           </div>
 
           <div
-            className={`${paperSize === "dot-matrix" ? "w-full" : "md:col-span-7"
+            className={`${paperSize === "dot-matrix" || paperSize === "a4" ? "w-full" : "md:col-span-7"
               } bg-slate-100 p-4 rounded-2xl border border-slate-200 flex flex-col items-center overflow-x-auto`}
           >
             <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">
-              Preview {paperSize === "dot-matrix" ? "Faktur Continuous Form (SPC SQ 300)" : `Struk Thermal (${paperSize})`}
+              Preview {paperSize === "a4" ? "Faktur A4 (HVS Penuh)" : paperSize === "dot-matrix" ? "Faktur Continuous Form (SPC SQ 300)" : `Struk Thermal (${paperSize})`}
             </span>
             <div className="shadow-xl rounded-lg overflow-hidden border border-slate-300 bg-white w-full flex justify-center">
               <ReceiptPrint transaction={completedTx} paperSize={paperSize} />
