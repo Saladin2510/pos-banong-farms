@@ -47,12 +47,13 @@ export const ReceiptPrint: React.FC<ReceiptPrintProps> = ({
   // --------------------------------------------------------------------------
   // 1. FORMAT FAKTUR PENJUALAN CONTINUOUS FORM (SPC SQ 300 / DOT MATRIX)
   // Desain 100% presisi sesuai standar faktur penjualan CV Fortuna Baru PS / Banong
+  // Sesuai standar kertas A4 / Continuous Form
   // --------------------------------------------------------------------------
   if (paperSize === "dot-matrix") {
     return (
       <div
         id="printable-receipt"
-        className={`bg-white text-black text-[11px] sm:text-[12px] leading-tight p-4 sm:p-6 mx-auto w-full max-w-[215mm] border border-dashed border-slate-300 print:border-none print:p-0 ${className}`}
+        className={`bg-white text-black text-[11px] sm:text-[12px] leading-tight p-4 sm:p-6 mx-auto w-full max-w-[200mm] print:max-w-none print:w-full print:p-0 print:m-0 border border-dashed border-slate-300 print:border-none ${className}`}
         style={{
           fontFamily:
             'Arial, "Helvetica Neue", Helvetica, "Segoe UI", sans-serif',
@@ -64,27 +65,20 @@ export const ReceiptPrint: React.FC<ReceiptPrintProps> = ({
             HEADER: LOGO & PERUSAHAAN (KIRI) | METADATA TRANSAKSI (KANAN)
         =================================================================== */}
         <div className="flex flex-col sm:flex-row items-start justify-between gap-3 pb-1">
-          {/* Sisi Kiri: Logo Siluet Ternak + Header Perusahaan */}
+          {/* Sisi Kiri: Logo Hitam Putih + Header Perusahaan */}
           <div className="flex items-start gap-3">
-            {/* Siluet Peternakan & Unggas (Rooster & Farm Cattle) */}
-            <svg
-              className="w-14 h-14 shrink-0 text-black fill-current"
-              viewBox="0 0 100 100"
-              xmlns="http://www.w3.org/2000/svg"
-              aria-label="Logo CV. Fortuna Baru PS"
-            >
-              {/* Burung Walet Terbang */}
-              <path d="M10 22 C12 17, 16 18, 18 21 C20 18, 24 19, 26 22 C23 24, 21 26, 18 25 C16 27, 13 26, 10 22 Z" />
-              <path d="M17 14 C19 11, 22 12, 23 14 C25 12, 28 13, 29 15 C27 16, 25 18, 23 17 C21 19, 19 18, 17 14 Z" />
-              {/* Siluet Ayam / Jago */}
-              <path d="M26 26 C25 21, 29 17, 34 19 C37 16, 42 17, 44 21 C48 19, 52 23, 50 27 C53 29, 55 34, 52 38 C56 37, 60 40, 58 45 C56 49, 51 51, 47 49 C45 53, 40 56, 36 54 C33 56, 28 54, 27 50 C24 50, 21 47, 22 43 C19 41, 18 36, 21 32 C23 29, 25 27, 26 26 Z" />
-              {/* Siluet Sapi / Ternak Besar */}
-              <path d="M28 50 C33 45, 42 44, 50 47 C58 50, 65 57, 68 65 C71 73, 68 81, 61 86 C55 90, 47 91, 41 87 C35 83, 30 76, 29 68 C27 63, 26 56, 28 50 Z" />
-              <path
-                d="M40 72 C42 70, 46 71, 48 74 C49 77, 47 81, 44 82 C41 83, 38 80, 38 77 C38 74, 39 73, 40 72 Z"
-                fill="#ffffff"
+            {/* Logo Hitam Putih CV Banong Farms / Fortuna Baru */}
+            <div className="w-14 h-14 shrink-0 flex items-center justify-center bg-white">
+              <img
+                src="/logo-banong-bw.png"
+                alt="Logo Hitam Putih"
+                className="w-full h-full object-contain"
+                style={{
+                  WebkitPrintColorAdjust: "exact",
+                  printColorAdjust: "exact",
+                }}
               />
-            </svg>
+            </div>
 
             <div className="space-y-0.5 leading-tight">
               <h1 className="text-base sm:text-lg font-black tracking-normal uppercase text-black">
@@ -106,42 +100,42 @@ export const ReceiptPrint: React.FC<ReceiptPrintProps> = ({
           <div className="w-full sm:w-auto shrink-0 text-[10px] sm:text-[11px] text-black">
             <div className="grid grid-cols-12 gap-x-2">
               <div className="col-span-8 space-y-0.5">
-                <div className="flex">
+                <div className="flex items-start">
                   <span className="w-22 shrink-0">No Transaksi</span>
                   <span className="w-3 shrink-0 text-center">:</span>
-                  <span className="font-bold">{transaction.invoiceNo}</span>
+                  <span className="font-bold flex-1">{transaction.invoiceNo}</span>
                 </div>
-                <div className="flex">
+                <div className="flex items-start">
                   <span className="w-22 shrink-0">Tanggal</span>
                   <span className="w-3 shrink-0 text-center">:</span>
-                  <span>{formatInvoiceDateTime(transaction.createdAt)}</span>
+                  <span className="flex-1">{formatInvoiceDateTime(transaction.createdAt)}</span>
                 </div>
-                <div className="flex">
+                <div className="flex items-start">
                   <span className="w-22 shrink-0">Pelanggan</span>
                   <span className="w-3 shrink-0 text-center">:</span>
-                  <span className="font-bold uppercase truncate max-w-[150px] sm:max-w-[200px]">
+                  <span className="font-bold uppercase break-words flex-1">
                     {customerDisplay}
                   </span>
                 </div>
-                <div className="flex">
+                <div className="flex items-start">
                   <span className="w-22 shrink-0">Alamat</span>
                   <span className="w-3 shrink-0 text-center">:</span>
-                  <span className="uppercase truncate max-w-[150px] sm:max-w-[200px]">
+                  <span className="uppercase break-words flex-1">
                     {addressDisplay}
                   </span>
                 </div>
               </div>
 
               <div className="col-span-4 space-y-0.5 pl-2">
-                <div className="flex">
+                <div className="flex items-start">
                   <span className="w-10 shrink-0">Dept.</span>
                   <span className="w-3 shrink-0 text-center">:</span>
-                  <span>{STORE_INFO.dept}</span>
+                  <span className="flex-1">{STORE_INFO.dept}</span>
                 </div>
-                <div className="flex">
+                <div className="flex items-start">
                   <span className="w-10 shrink-0">User</span>
                   <span className="w-3 shrink-0 text-center">:</span>
-                  <span className="uppercase">{cashierDisplay}</span>
+                  <span className="uppercase flex-1">{cashierDisplay}</span>
                 </div>
               </div>
             </div>
@@ -166,10 +160,10 @@ export const ReceiptPrint: React.FC<ReceiptPrintProps> = ({
           {/* Garis batas atas & bawah header tabel */}
           <div className="border-t border-b border-black py-1 flex items-center font-bold text-[10px] sm:text-[11px] text-black">
             <span className="w-[5%] text-left">No.</span>
-            <span className="w-[12%] text-left">Kode Item</span>
-            <span className="w-[32%] text-left">Nama Item</span>
-            <span className="w-[18%] text-right">Jml Satuan</span>
-            <span className="w-[14%] text-right">Harga</span>
+            <span className="w-[14%] text-left">Kode Item</span>
+            <span className="w-[33%] text-left">Nama Item</span>
+            <span className="w-[16%] text-right">Jml Satuan</span>
+            <span className="w-[13%] text-right">Harga</span>
             <span className="w-[6%] text-right">Pot</span>
             <span className="w-[13%] text-right">Total</span>
           </div>
@@ -195,16 +189,16 @@ export const ReceiptPrint: React.FC<ReceiptPrintProps> = ({
                   <span className="w-[5%] text-left tabular-nums">
                     {idx + 1}
                   </span>
-                  <span className="w-[12%] text-left font-mono truncate">
+                  <span className="w-[14%] text-left font-mono break-all pr-1">
                     {item.product.sku || "00" + (idx + 26)}
                   </span>
-                  <span className="w-[32%] text-left truncate font-medium">
+                  <span className="w-[33%] text-left font-medium break-words pr-1">
                     {item.product.name}
                   </span>
-                  <span className="w-[18%] text-right tabular-nums">
+                  <span className="w-[16%] text-right tabular-nums">
                     {formatAccountingNumber(item.qty)} {unitLabel}
                   </span>
-                  <span className="w-[14%] text-right tabular-nums">
+                  <span className="w-[13%] text-right tabular-nums">
                     {formatAccountingNumber(unitPrice)}
                   </span>
                   <span className="w-[6%] text-right tabular-nums">
@@ -230,16 +224,16 @@ export const ReceiptPrint: React.FC<ReceiptPrintProps> = ({
           <div className="col-span-5 flex flex-col justify-between">
             <div className="space-y-1">
               <div className="flex items-start">
-                <span className="w-20 shrink-0">Keterangan</span>
-                <span className="w-3 shrink-0 text-center">:</span>
-                <span className="flex-1">
-                  {transaction.globalNote || ""}
+                <span className="w-20 shrink-0 font-bold">Keterangan</span>
+                <span className="w-3 shrink-0 text-center font-bold">:</span>
+                <span className="flex-1 break-words font-medium">
+                  {transaction.globalNote || "-"}
                 </span>
               </div>
               <div className="flex items-start">
-                <span className="w-20 shrink-0">Terbilang</span>
-                <span className="w-3 shrink-0 text-center">:</span>
-                <span className="flex-1 italic leading-tight">
+                <span className="w-20 shrink-0 font-bold">Terbilang</span>
+                <span className="w-3 shrink-0 text-center font-bold">:</span>
+                <span className="flex-1 italic break-words leading-tight">
                   {formatTerbilang(transaction.grandTotal).toLowerCase()}
                 </span>
               </div>
@@ -342,6 +336,14 @@ export const ReceiptPrint: React.FC<ReceiptPrintProps> = ({
               </span>
             </div>
           </div>
+        </div>
+
+        {/* ===================================================================
+            CATATAN / FOOTER NOTE DI BAGIAN PALING BAWAH FAKTUR
+        =================================================================== */}
+        <div className="mt-4 pt-1.5 border-t border-dashed border-black/60 flex items-center justify-between text-[9px] text-black">
+          <span>* Catatan: Barang yang sudah dibeli tidak dapat ditukar/dikembalikan kecuali ada perjanjian sebelumnya.</span>
+          <span>Lembar 1: Kantor/Kasir | Lembar 2: Pelanggan</span>
         </div>
       </div>
     );

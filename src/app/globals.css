@@ -64,8 +64,8 @@ dialog::backdrop {
 
 @media print {
   @page {
-    margin: 0;
-    size: auto;
+    size: A4 portrait;
+    margin: 8mm 10mm 8mm 10mm;
   }
 
   html,
@@ -74,6 +74,7 @@ dialog::backdrop {
     color: #000000 !important;
     margin: 0 !important;
     padding: 0 !important;
+    width: 100% !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
@@ -90,6 +91,7 @@ dialog::backdrop {
   #print-only-root {
     display: block !important;
     width: 100% !important;
+    max-width: 100% !important;
     margin: 0 auto !important;
     padding: 0 !important;
   }
