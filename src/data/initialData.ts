@@ -454,7 +454,7 @@ export const STORE_INFO = {
   brandName: "CV Banong Farms",
   legalName: "CV. BANONG FARMS AJIBARANG",
   address: "H3VF+9PX, Jl. Tambakan, Tambakan, Ajibarang Kulon, Kec. Ajibarang, Kabupaten Banyumas, Jawa Tengah 53163, Indonesia",
-  phone: "085826349147 - 087749881400",
+  phone: "+62 857-2608-0086",
   bankBca: "3620275866",
   bankBri: "6070-01-036893-53-5",
   rekeningText: "BCA 3620275866 | BRI 6070-01-036893-53-5",
