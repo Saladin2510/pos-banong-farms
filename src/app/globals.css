@@ -65,7 +65,7 @@ dialog::backdrop {
 @media print {
   @page {
     size: auto;
-    margin: 5mm 8mm;
+    margin: 0mm;
   }
 
   html,
@@ -89,10 +89,13 @@ dialog::backdrop {
   }
 
   #print-only-root {
-    display: block !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
     width: 100% !important;
     max-width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
+    margin: 0 auto !important;
+    padding: 2mm 0 !important;
+    box-sizing: border-box !important;
   }
 }

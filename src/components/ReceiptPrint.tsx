@@ -58,7 +58,7 @@ export const ReceiptPrint: React.FC<ReceiptPrintProps> = ({
     return (
       <div
         id="printable-receipt"
-        className={`bg-white text-black text-[12px] sm:text-[13px] leading-relaxed p-6 sm:p-8 mx-auto w-full max-w-[210mm] print:max-w-none print:w-full print:p-0 print:m-0 border border-slate-300 print:border-none flex flex-col justify-between min-h-[260mm] print:min-h-0 ${className}`}
+        className={`bg-white text-black text-[12px] sm:text-[13px] leading-relaxed p-6 sm:p-8 mx-auto w-full max-w-[210mm] print:max-w-[190mm] print:w-[190mm] print:mx-auto print:my-0 print:px-3 print:py-2 print:box-border border border-slate-300 print:border-none flex flex-col justify-between min-h-[260mm] print:min-h-0 ${className}`}
         style={{
           fontFamily:
             'Arial, "Helvetica Neue", Helvetica, "Segoe UI", sans-serif',
@@ -308,7 +308,7 @@ export const ReceiptPrint: React.FC<ReceiptPrintProps> = ({
     return (
       <div
         id="printable-receipt"
-        className={`bg-white text-black text-[11px] sm:text-[12px] leading-tight p-4 sm:p-5 mx-auto w-full max-w-[215mm] print:max-w-none print:w-full print:p-0 print:m-0 border border-dashed border-slate-300 print:border-none ${className}`}
+        className={`bg-white text-black text-[11px] sm:text-[12px] leading-tight p-4 sm:p-5 mx-auto w-full max-w-[215mm] print:max-w-[190mm] print:w-[190mm] print:mx-auto print:my-0 print:px-3 print:py-1 print:box-border border border-dashed border-slate-300 print:border-none ${className}`}
         style={{
           fontFamily:
             'Arial, "Helvetica Neue", Helvetica, "Segoe UI", sans-serif',
