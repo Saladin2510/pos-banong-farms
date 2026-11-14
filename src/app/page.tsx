@@ -1211,6 +1211,36 @@ export default function PosPage() {
                   )}
                 </div>
 
+                {/* Tipe Pembelian Kasir: Eceran vs Grosir */}
+                <div className="flex items-center p-1 rounded-xl bg-slate-100 border border-slate-200 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => handleSwitchGlobalPriceTier("Eceran")}
+                    className={`px-3 py-2 rounded-lg text-xs font-black transition flex items-center gap-1.5 cursor-pointer ${
+                      defaultPriceTier === "Eceran"
+                        ? "bg-white text-emerald-800 shadow-2xs border border-emerald-200"
+                        : "text-slate-500 hover:text-slate-800"
+                    }`}
+                    title="Mode Harga Eceran (Satuan Umum)"
+                  >
+                    <Tag className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Eceran</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleSwitchGlobalPriceTier("Grosir")}
+                    className={`px-3 py-2 rounded-lg text-xs font-black transition flex items-center gap-1.5 cursor-pointer ${
+                      defaultPriceTier === "Grosir"
+                        ? "bg-amber-600 text-white shadow-2xs"
+                        : "text-slate-500 hover:text-slate-800"
+                    }`}
+                    title="Mode Harga Grosir (Partai / Peternak Mitra)"
+                  >
+                    <Package className="w-3.5 h-3.5" />
+                    <span>Grosir</span>
+                  </button>
+                </div>
+
                 {/* Quick "+ Tambah Produk" Button */}
                 <button
                   type="button"
@@ -1368,12 +1398,36 @@ export default function PosPage() {
                               {product.name}
                             </h3>
 
-                            <div className="flex items-baseline gap-1">
-                              <span className="text-xs sm:text-base font-black text-slate-900 tabular-nums">
-                                {formatRupiah(product.sellPrice)}
-                              </span>
-                              <span className="text-[9px] sm:text-[10px] font-bold text-slate-400 truncate">
-                                /{product.unit || "Kg"}
+                            <div className="flex flex-col">
+                              <div className="flex items-baseline gap-1">
+                                <span
+                                  className={`text-xs sm:text-base font-black tabular-nums ${
+                                    defaultPriceTier === "Grosir"
+                                      ? "text-amber-700"
+                                      : "text-slate-900"
+                                  }`}
+                                >
+                                  {formatRupiah(
+                                    defaultPriceTier === "Grosir"
+                                      ? product.wholesalePrice || product.sellPrice
+                                      : product.sellPrice
+                                  )}
+                                </span>
+                                <span className="text-[9px] sm:text-[10px] font-bold text-slate-400 truncate">
+                                  /{product.unit || "Kg"}
+                                </span>
+                                {defaultPriceTier === "Grosir" && (
+                                  <span className="text-[9px] font-black px-1.5 py-0.2 rounded-md bg-amber-100 text-amber-900">
+                                    Grosir
+                                  </span>
+                                )}
+                              </div>
+                              <span className="text-[10px] text-slate-400 font-medium truncate">
+                                {defaultPriceTier === "Grosir"
+                                  ? `Eceran: ${formatRupiah(product.sellPrice)}`
+                                  : `Grosir: ${formatRupiah(
+                                      product.wholesalePrice || product.sellPrice
+                                    )}`}
                               </span>
                             </div>
                           </div>
@@ -1456,31 +1510,64 @@ export default function PosPage() {
             </div>
 
             {/* 1. Header Keranjang: Bersih & Minimalis */}
-            <div className="px-4 py-3 border-b border-slate-200 bg-slate-50/70 shrink-0 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <ShoppingCart className="w-4 h-4 text-emerald-700" />
-                <h2 className="text-sm font-extrabold text-slate-800">Keranjang Belanja</h2>
+            <div className="px-4 py-3 border-b border-slate-200 bg-slate-50/70 shrink-0 space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <ShoppingCart className="w-4 h-4 text-emerald-700" />
+                  <h2 className="text-sm font-extrabold text-slate-800">Keranjang Belanja</h2>
+                  {cart.length > 0 && (
+                    <span className="text-[11px] font-black bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">
+                      {cart.reduce((sum, item) => sum + item.qty, 0)}
+                    </span>
+                  )}
+                </div>
+
                 {cart.length > 0 && (
-                  <span className="text-[11px] font-black bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">
-                    {cart.reduce((sum, item) => sum + item.qty, 0)}
-                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCart([]);
+                      showToast("Keranjang belanja dikosongkan");
+                    }}
+                    title="Kosongkan Keranjang"
+                    className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Kosongkan</span>
+                  </button>
                 )}
               </div>
 
-              {cart.length > 0 && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setCart([]);
-                    showToast("Keranjang belanja dikosongkan");
-                  }}
-                  title="Kosongkan Keranjang"
-                  className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                  <span>Kosongkan</span>
-                </button>
-              )}
+              {/* Tipe Pembelian Nota: Eceran vs Grosir */}
+              <div className="flex items-center justify-between bg-white p-1.5 rounded-xl border border-slate-200 shadow-2xs">
+                <span className="text-[11px] font-bold text-slate-600 pl-1">
+                  Tipe Pembelian Nota:
+                </span>
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => handleSwitchGlobalPriceTier("Eceran")}
+                    className={`px-3 py-1 rounded-lg text-xs font-black transition cursor-pointer ${
+                      defaultPriceTier === "Eceran"
+                        ? "bg-emerald-700 text-white shadow-2xs"
+                        : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                    }`}
+                  >
+                    🏷️ Eceran
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleSwitchGlobalPriceTier("Grosir")}
+                    className={`px-3 py-1 rounded-lg text-xs font-black transition cursor-pointer ${
+                      defaultPriceTier === "Grosir"
+                        ? "bg-amber-600 text-white shadow-2xs"
+                        : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                    }`}
+                  >
+                    📦 Grosir
+                  </button>
+                </div>
+              </div>
             </div>
 
             {/* 2. Scrollable Cart Items List (Spacious & Clean Layout) */}
@@ -1503,62 +1590,6 @@ export default function PosPage() {
                   >
                     Buka Katalog Produk
                   </button>
-                </div>
-              ) : (
-                cart.map((item) => (
-                  <CartItemRow
-                    key={item.cartItemId}
-                    item={item}
-                    onUpdateQty={handleUpdateQty}
-                    onTogglePriceTier={handleToggleItemPriceTier}
-                    onRemove={handleRemoveCartItem}
-                    onCustomize={setCustomizingItem}
-                  />
-                ))
-              )}
-            </div>
-
-            {/* 3. Sticky Payment Footer (THE ONLY PLACE FOR PAYMENT & SIMPAN ACTIONS) */}
-            <div className="border-t border-slate-200 bg-slate-50 px-4 py-3 space-y-2 shrink-0 safe-area-bottom">
-              <div className="flex items-center gap-2">
-                <ShoppingCart className="w-4 h-4 text-emerald-700" />
-                <h2 className="text-sm font-extrabold text-slate-800">Keranjang Belanja</h2>
-                {cart.length > 0 && (
-                  <span className="text-[11px] font-black bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">
-                    {cart.reduce((sum, item) => sum + item.qty, 0)}
-                  </span>
-                )}
-              </div>
-
-              {cart.length > 0 && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setCart([]);
-                    showToast("Keranjang belanja dikosongkan");
-                  }}
-                  title="Kosongkan Keranjang"
-                  className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                  <span>Kosongkan</span>
-                </button>
-              )}
-            </div>
-
-            {/* 2. Scrollable Cart Items List (Spacious & Clean Layout) */}
-            <div className="flex-1 min-h-0 overflow-y-auto px-4 py-2 divide-y divide-slate-100">
-              {cart.length === 0 ? (
-                <div className="h-full flex flex-col items-center justify-center text-center py-6 text-slate-400 space-y-2">
-                  <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-300">
-                    <Store className="w-6 h-6" />
-                  </div>
-                  <p className="text-sm font-extrabold text-slate-700">
-                    Keranjang Belanja Kosong
-                  </p>
-                  <p className="text-xs text-slate-400 max-w-[220px] leading-relaxed">
-                    Pilih produk dari katalog di sebelah kiri untuk menambah ke nota transaksi.
-                  </p>
                 </div>
               ) : (
                 cart.map((item) => (
@@ -1745,11 +1776,30 @@ const CartItemRow: React.FC<CartItemRowProps> = ({
         </span>
       </div>
 
-      {/* Price Per Unit */}
-      <div className="flex items-center justify-between text-xs text-slate-500">
-        <span className="tabular-nums font-semibold">
-          @ {formatRupiah(unitBasePrice)} / {item.product.unit || "Unit"}
-        </span>
+      {/* Price Per Unit & Tipe Harga Toggle Badge */}
+      <div className="flex items-center justify-between text-xs">
+        <div className="flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => onTogglePriceTier(item.cartItemId)}
+            className={`px-2 py-0.5 rounded-full text-[10px] font-black tracking-wider uppercase transition cursor-pointer border ${
+              isGrosir
+                ? "bg-amber-100 text-amber-900 border-amber-300 hover:bg-amber-200"
+                : "bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100"
+            }`}
+            title="Klik untuk mengubah antara Harga Eceran dan Harga Grosir"
+          >
+            {isGrosir ? "📦 Grosir" : "🏷️ Eceran"}
+          </button>
+          <span className="tabular-nums font-semibold text-slate-500">
+            @ {formatRupiah(unitBasePrice)} / {item.product.unit || "Unit"}
+          </span>
+        </div>
+        {isGrosir && item.product.sellPrice > (item.product.wholesalePrice || item.product.sellPrice) && (
+          <span className="text-[10px] font-extrabold text-amber-700">
+            Hemat {formatRupiah(item.product.sellPrice - (item.product.wholesalePrice || item.product.sellPrice))}
+          </span>
+        )}
       </div>
 
       {(item.discountItem > 0 || item.modifiers.length > 0 || item.note) && (
